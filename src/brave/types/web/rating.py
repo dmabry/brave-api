@@ -1,12 +1,12 @@
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from .profile import Profile
 
 
-class Rating(BaseModel):
+class Rating(BraveSearchModel):
     """The rating associated with an entity."""
 
     ratingValue: Optional[float] = Field(default=None, description="The current value of the rating.")

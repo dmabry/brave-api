@@ -2,15 +2,15 @@ from typing import List
 from typing import Optional
 from typing import Union
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from .person import Person
 from .price import Price
 from .rating import Rating
 
 
-class Book(BaseModel):
+class Book(BraveSearchModel):
     """A model representing a book result."""
 
     title: str = Field(description="The title of the book.")

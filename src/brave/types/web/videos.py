@@ -1,19 +1,20 @@
 from typing import List
 from typing import Optional
+from typing import Union
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from ..shared.meta_url import MetaUrl
 from ..shared.thumbnail import Thumbnail
 from .result import Result
 
 
-class VideoData(BaseModel):
+class VideoData(BraveSearchModel):
     """A model representing metadata gathered for a video."""
 
     duration: Optional[str] = Field(default=None, description="A time string representing the duration of the video.")
-    views: Optional[str] = Field(default=None, description="The number of views of the video.")
+    views: Optional[Union[int, str]] = Field(default=None, description="The number of views of the video.")
     creator: Optional[str] = Field(default=None, description="The creator of the video.")
     publisher: Optional[str] = Field(default=None, description="The publisher of the video.")
     thumbnail: Optional[Thumbnail] = Field(default=None, description="A thumbnail associated with the video.")
@@ -31,9 +32,11 @@ class VideoResult(Result):
     age: Optional[str] = Field(default=None, description="A string representing the age of the video.")
 
 
-class Videos(BaseModel):
+class Videos(BraveSearchModel):
     """A model representing video results."""
 
     type: str = Field(default="videos", description="The type representing the videos. The value is always videos.")
     results: List[VideoResult] = Field(description="A list of video results.")
-    mutated_by_goggles: bool = Field(description="Whether the videos result were changed by a goggle.")
+    mutated_by_goggles: Optional[bool] = Field(
+        default=None, description="Whether the videos result were changed by a goggle."
+    )

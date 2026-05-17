@@ -1,12 +1,12 @@
 from typing import List
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from .search_result import SearchResult
 
 
-class ForumData(BaseModel):
+class ForumData(BraveSearchModel):
     """Defines a result from a discussion forum."""
 
     forum_name: str = Field(description="The name for the forum.")
@@ -26,7 +26,7 @@ class DiscussionResult(SearchResult):
     data: ForumData = Field(description="The enriched aggregated data for the relevant forum post.")
 
 
-class Discussions(BaseModel):
+class Discussions(BraveSearchModel):
     """A model representing a discussion cluster relevant to the query."""
 
     type: str = Field(

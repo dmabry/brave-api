@@ -1,14 +1,12 @@
-import logging
-
 from typing import List
 from typing import Optional
 from typing import Tuple
 
-import numpy as np
-
-from pydantic import BaseModel
 from pydantic import Field
 
+from brave.downloads import DEFAULT_DOWNLOAD_TIMEOUT
+
+from ..base import BraveSearchModel
 from .discussions import Discussions
 from .faq import FAQ
 from .info_box import GraphInfobox
@@ -16,18 +14,23 @@ from .location_result import Locations
 from .mixed_response import MixedResponse
 from .news import News
 from .query import Query
+from .result_helpers import ProductClusterItem
+from .result_helpers import average_product_review_score as average_product_review_score_for_results
+from .result_helpers import download_pdf_results
+from .result_helpers import flattened_product_cluster
+from .result_helpers import product_price_range
+from .result_helpers import product_price_values
 from .search import Search
 from .search_result import SearchResult
 from .videos import Videos
 
 
-logger = logging.getLogger(__name__)
-
-
-class WebSearchApiResponse(BaseModel):
+class WebSearchApiResponse(BraveSearchModel):
     """Brave Search API response object"""
 
-    query: Query = Field(description="Search query string and its modifications that are used for search.")
+    query: Optional[Query] = Field(
+        default=None, description="Search query string and its modifications that are used for search."
+    )
     mixed: Optional[MixedResponse] = Field(default=None, description="Preferred ranked order of search results.")
     type: str = Field(default="search", description="The type of web search API result. The value is always search.")
     web: Optional[Search] = Field(default=None, description="Web search results relevant to the query.")
@@ -89,45 +92,32 @@ class WebSearchApiResponse(BaseModel):
         return _results.get("videos").get("results") if self.videos else []
 
     @property
-    def product_cluster(self) -> List[str]:
+    def product_cluster(self) -> List[ProductClusterItem]:
         """Return a list of product clusters."""
-        return [result.product_cluster for result in self._web_results if result.subtype == "product_cluster"][0]
+        return list(self._product_cluster_items())
 
-    def download_all_pdfs(self, path: str = "downloads") -> None:
+    def download_pdfs(self, path: str = "downloads", timeout: float = DEFAULT_DOWNLOAD_TIMEOUT) -> List[str]:
         """Download PDFs for all search results."""
-        for result in self._web_results:
-            if result.content_type == "pdf":
-                result.download_pdf(path=path)
+        return download_pdf_results(self._web_results, path=path, timeout=timeout)
 
-    def product_prices(self) -> List[int]:
+    def download_all_pdfs(self, path: str = "downloads", timeout: float = DEFAULT_DOWNLOAD_TIMEOUT) -> List[str]:
+        """Download PDFs for all search results."""
+        return self.download_pdfs(path=path, timeout=timeout)
+
+    def product_prices(self) -> List[float]:
         """Return a list of product prices."""
-        if len(self.product_cluster) == 0:
-            return [
-                float(result.product.price) for result in self._web_results if result.product and result.product.price
-            ]
-        else:
-            return [float(result.price) for result in self.product_cluster]
+        return product_price_values(self._web_results, product_cluster=self._product_cluster_items())
 
-    def product_price_ranges(self) -> Tuple[int, int]:
+    def product_price_ranges(self) -> Optional[Tuple[float, float]]:
         """Return a list of product price ranges."""
-        prices = self.product_prices()
-        return (min(prices), max(prices))
+        return product_price_range(self.product_prices())
 
     def average_product_review_score(self) -> Optional[float]:
         """Return the average product review score out of 100."""
-        if len(self.product_cluster) == 0:
-            ratings = [
-                float(result.product.rating.ratingValue) / float(result.product.rating.bestRating)
-                for result in self._web_results
-                if result.product and result.product.rating
-            ]
-        else:
-            ratings = [
-                float(product.rating.ratingValue) / float(product.rating.bestRating)
-                for product in self.product_cluster
-                if product.rating and product.rating.ratingValue and product.rating.bestRating
-            ]
-        if ratings:
-            return np.mean([r for r in ratings if r is not None]) * 100
-        else:
-            return None
+        return average_product_review_score_for_results(
+            self._web_results,
+            product_cluster=self._product_cluster_items(),
+        )
+
+    def _product_cluster_items(self) -> Tuple[ProductClusterItem, ...]:
+        return flattened_product_cluster(self._web_results)

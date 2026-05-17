@@ -1,9 +1,10 @@
-from pydantic import BaseModel
 from pydantic import Field
 from pydantic import HttpUrl
 
+from ..base import BraveSearchModel
 
-class Profile(BaseModel):
+
+class Profile(BraveSearchModel):
     """
     Profile of an entity.
 

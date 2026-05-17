@@ -1,9 +1,10 @@
-from pydantic import BaseModel
 from pydantic import Field
 from pydantic import HttpUrl
 
+from ..base import BraveSearchModel
 
-class Offer(BaseModel):
+
+class Offer(BraveSearchModel):
     """An offer associated with a product."""
 
     url: HttpUrl = Field(description="The URL where the offer can be found.")

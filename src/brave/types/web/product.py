@@ -1,15 +1,15 @@
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from ..shared.thumbnail import Thumbnail
 from .offer import Offer
 from .rating import Rating
 
 
-class Product(BaseModel):
+class Product(BraveSearchModel):
     """A model representing a product."""
 
     type: str = Field(

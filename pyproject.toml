@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "brave-search"
-version = "0.2.0"
+version = "0.2.1"
 description = "Brave Search API wrapper"
 authors = ["Kayvane Shakerifar"]
 readme = "README.md"
@@ -18,11 +18,9 @@ generate-setup-file = false
 [tool.poetry.dependencies]
 python = "^3.8"
 requests = "^2.26.0"
-httpx = ">=0.24.0, <0.26.0"
+httpx = ">=0.24.0,<1.0.0"
 tenacity = "^8.2.3"
 pydantic = "^2.5.2"
-pytest-asyncio = "^0.23.2"
-numpy = "^1.24.4"
 
 [tool.poetry.group.test]
 optional = true
@@ -30,9 +28,11 @@ optional = true
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.1.1" # Allows for testing of the project
+pytest-asyncio = "^0.23.2" # Allows async tests to run under pytest
 pytest-cov = "^4.0.0" # Allows to run coverage of the project
 moto = "^3.1.6" # Allows for mocking of AWS services
 coverage = "^7.3.3" # Allows for coverage of the project
+packaging = ">=23.0" # Allows wheel metadata validation in packaging checks
 
 [tool.poetry.group.lint]
 optional = true

@@ -1,13 +1,13 @@
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 from pydantic import HttpUrl
 
+from ..base import BraveSearchModel
 from .profile import Profile
 
 
-class Result(BaseModel):
+class Result(BraveSearchModel):
     """
     Model represents a web search result.
 

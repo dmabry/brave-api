@@ -6,13 +6,11 @@ inputs:
   github_token:
     description: Token to authenticate with GitHub
     required: true
-    type: string
 
   build_artifacts:
     description: Build artifacts and add to release
     required: true
-    default: false
-    type: boolean
+    default: "false"
 
 runs:
   using: "composite"
@@ -20,7 +18,7 @@ runs:
     - name: Get version
       id: get-version
       shell: bash
-      run: echo "##[set-output name=tag;]$(poetry version --short)"
+      run: echo "tag=$(poetry version --short)" >> "$GITHUB_OUTPUT"
 
     - name: Create Release
       uses: ncipollo/release-action@v1
@@ -54,7 +52,9 @@ runs:
 
     - name: Extract Major Version
       shell: bash
-      run: echo "##[set-output name=tag;]$(echo ${{ steps.get-version.outputs.tag }} | cut -d '.' -f1)"
+      run: |
+        tag="${{ steps.get-version.outputs.tag }}"
+        echo "tag=${tag%%.*}" >> "$GITHUB_OUTPUT"
       id: extract_major_version
 
     - name: Update Major Tag

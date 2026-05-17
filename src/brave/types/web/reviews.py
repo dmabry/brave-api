@@ -1,14 +1,14 @@
 from typing import List
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from ..shared.thumbnail import Thumbnail
 from .person import Person
 from .rating import Rating
 
 
-class TripAdvisorReview(BaseModel):
+class TripAdvisorReview(BraveSearchModel):
     """A model representing a TripAdvisor review."""
 
     title: str = Field(description="The title of the review.")
@@ -20,7 +20,7 @@ class TripAdvisorReview(BaseModel):
     language: str = Field(description="The language of the review.")
 
 
-class Reviews(BaseModel):
+class Reviews(BraveSearchModel):
     """The reviews associated with an entity."""
 
     results: List[TripAdvisorReview] = Field(description="A list of TripAdvisor reviews for the entity.")
@@ -28,7 +28,7 @@ class Reviews(BaseModel):
     reviews_in_foreign_language: bool = Field(description="Any reviews available in a foreign language.")
 
 
-class Review(BaseModel):
+class Review(BraveSearchModel):
     """A model representing a review for an entity."""
 
     type: str = Field(default="review", description="A string representing review type. This is always review.")

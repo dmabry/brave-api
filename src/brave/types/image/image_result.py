@@ -1,13 +1,13 @@
-from pydantic import BaseModel
 from pydantic import Field
 from pydantic import HttpUrl
 
+from ..base import BraveSearchModel
 from ..shared.meta_url import MetaUrl
 from ..shared.thumbnail import Thumbnail
 from .properties import Properties
 
 
-class ImageResult(BaseModel):
+class ImageResult(BraveSearchModel):
     """A model representing an image result for the requested query."""
 
     type: str = Field(

@@ -1,10 +1,11 @@
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 
-class Thumbnail(BaseModel):
+
+class Thumbnail(BraveSearchModel):
     """Aggregated details representing a picture thumbnail."""
 
     src: Optional[str] = Field(default=None, description="The served URL of the image.")

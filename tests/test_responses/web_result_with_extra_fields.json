@@ -1,0 +1,34 @@
+{
+    "type": "search",
+    "query": {
+        "original": "blue tack",
+        "upstream_query_hint": "new-field"
+    },
+    "web": {
+        "type": "search",
+        "ranking_hint": "freshness",
+        "results": [
+            {
+                "title": "Blu Tack Example",
+                "url": "https://example.com/blu-tack",
+                "description": "A result with additional snippets and upstream fields.",
+                "type": "search_result",
+                "subtype": "generic",
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "example.com",
+                    "hostname": "example.com",
+                    "favicon": "https://example.com/favicon.ico",
+                    "path": "› blu-tack"
+                },
+                "language": "en",
+                "extra_snippets": [
+                    "Alternate snippet one.",
+                    "Alternate snippet two."
+                ],
+                "freshness_score": 0.98
+            }
+        ]
+    },
+    "response_feature": "beta"
+}

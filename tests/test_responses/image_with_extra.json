@@ -1,0 +1,40 @@
+{
+    "type": "images",
+    "query": {
+        "original": "mountain landscape"
+    },
+    "results": [
+        {
+            "type": "image_result",
+            "title": "Mountain Landscape",
+            "url": "https://example.com/mountain-landscape",
+            "source": "example.com",
+            "page_fetched": "2025-01-01T00:00:00Z",
+            "thumbnail": {
+                "src": "https://example.com/thumb.jpg",
+                "height": 200,
+                "width": 300
+            },
+            "properties": {
+                "url": "https://example.com/image.jpg",
+                "placeholder": "https://example.com/placeholder.jpg"
+            },
+            "meta_url": {
+                "scheme": "https",
+                "netloc": "example.com",
+                "hostname": "example.com",
+                "favicon": "https://example.com/favicon.ico",
+                "path": "› mountain-landscape"
+            },
+            "image_quality": {
+                "score": 0.91
+            }
+        }
+    ],
+    "extra": {
+        "total_estimated_matches": 1234,
+        "spellcheck": {
+            "altered": "mountain landscapes"
+        }
+    }
+}

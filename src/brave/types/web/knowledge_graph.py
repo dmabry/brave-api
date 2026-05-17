@@ -1,10 +1,10 @@
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from .url import URL
 
 
-class KnowledgeGraphEntity(BaseModel):
+class KnowledgeGraphEntity(BraveSearchModel):
     """Represents a knowledge graph entity."""
 
     title: str = Field(description="A short title describing the entity.")

@@ -1,11 +1,12 @@
 from typing import List
 
-from pydantic import BaseModel
 from pydantic import Field
 from pydantic import HttpUrl
 
+from ..base import BraveSearchModel
 
-class MobileUrlItem(BaseModel):
+
+class MobileUrlItem(BraveSearchModel):
     """A mobile-friendly representation of the URL."""
 
     original: str = Field(description="The original source URL.")
@@ -14,7 +15,7 @@ class MobileUrlItem(BaseModel):
     ios: str = Field(description="An iOS-friendly version of the URL.")
 
 
-class URL(BaseModel):
+class URL(BraveSearchModel):
     """A model representing a URL."""
 
     original: HttpUrl = Field(description="The original source URL.")

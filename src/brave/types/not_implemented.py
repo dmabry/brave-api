@@ -1,61 +1,67 @@
-from pydantic import BaseModel
+from .base import BraveSearchModel
 
 
-class Video(BaseModel):  # Replace with actual model definition
+class _PermissivePlaceholder(BraveSearchModel):
+    """Placeholder for upstream schemas that are not modeled yet."""
+
+    pass
+
+
+class Video(_PermissivePlaceholder):  # Replace with actual model definition
     """Video model"""
 
     pass
 
 
-class Movie(BaseModel):  # Replace with actual model definition
+class Movie(_PermissivePlaceholder):  # Replace with actual model definition
     """Movie model"""
 
     pass
 
 
-class CreativeWork(BaseModel):  # Replace with actual model definition
+class CreativeWork(_PermissivePlaceholder):  # Replace with actual model definition
     """CreativeWork model"""
 
     pass
 
 
-class MusicRecording(BaseModel):  # Replace with actual model definition
+class MusicRecording(_PermissivePlaceholder):  # Replace with actual model definition
     """MusicRecording model"""
 
     pass
 
 
-class Software(BaseModel):  # Replace with actual model definition
+class Software(_PermissivePlaceholder):  # Replace with actual model definition
     """Software model"""
 
     pass
 
 
-class Discussions(BaseModel):  # Replace with actual model definition
+class Discussions(_PermissivePlaceholder):  # Replace with actual model definition
     """Discussions model"""
 
     pass
 
 
-class GraphInfobox(BaseModel):  # Replace with actual model definition
+class GraphInfobox(_PermissivePlaceholder):  # Replace with actual model definition
     """GraphInfobox model"""
 
     pass
 
 
-class News(BaseModel):  # Replace with actual model definition
+class News(_PermissivePlaceholder):  # Replace with actual model definition
     """News model"""
 
     pass
 
 
-class Videos(BaseModel):  # Replace with actual model definition
+class Videos(_PermissivePlaceholder):  # Replace with actual model definition
     """Videos model"""
 
     pass
 
 
-class DeepResult(BaseModel):  # Replace with actual model definition
+class DeepResult(_PermissivePlaceholder):  # Replace with actual model definition
     """DeepResult model"""
 
     pass

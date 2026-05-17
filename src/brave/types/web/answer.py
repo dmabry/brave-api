@@ -1,9 +1,11 @@
-from pydantic import BaseModel
-from pydantic import Field
 from typing import Optional
 
+from pydantic import Field
 
-class Answer(BaseModel):
+from ..base import BraveSearchModel
+
+
+class Answer(BraveSearchModel):
     """A response representing an answer to a question on a forum."""
 
     text: str = Field(description="The main content of the answer.")

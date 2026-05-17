@@ -1,8 +1,9 @@
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 
-class PostalAddress(BaseModel):
+
+class PostalAddress(BraveSearchModel):
     """A model representing a postal address of a location."""
 
     type: str = Field(

@@ -43,6 +43,49 @@ def test_custom_endpoint_on_init():
     assert client.endpoint == "custom_endpoint"
 
 
+def test_web_request_builder_routes_headers_and_params():
+    client = BraveAPIClient(
+        api_key="test_api_key",
+        timeout=4,
+        api_version="2024-04-23",
+        cache_control="no-cache",
+        user_agent="test-agent",
+        location={"lat": 37.787, "long": -122.4, "timezone": "America/Los_Angeles"},
+    )
+
+    request = client._request_builder().web_search(
+        q="Blue tack",
+        count=99,
+        offset=99,
+        result_filter=["web", "videos"],
+        goggles=["https://example.com/a.goggle", "https://example.com/b.goggle"],
+        goggles_id="legacy-goggle",
+    )
+
+    assert request.url == "https://api.search.brave.com/res/v1/web/search"
+    assert request.timeout == 4
+    assert request.params["q"] == "Blue tack"
+    assert request.params["count"] == 20
+    assert request.params["offset"] == 9
+    assert request.params["result_filter"] == "web,videos"
+    assert request.params["goggles"] == ["https://example.com/a.goggle", "https://example.com/b.goggle"]
+    assert request.params["goggles_id"] == "legacy-goggle"
+    assert request.headers["Api-Version"] == "2024-04-23"
+    assert request.headers["Cache-Control"] == "no-cache"
+    assert request.headers["User-Agent"] == "test-agent"
+    assert request.headers["X-Loc-Lat"] == "37.787"
+    assert request.headers["X-Loc-Long"] == "-122.4"
+    assert request.headers["X-Loc-Timezone"] == "America/Los_Angeles"
+
+
+def test_image_request_builder_uses_images_endpoint():
+    client = BraveAPIClient(api_key="test_api_key")
+
+    request = client._request_builder().image_search(q="Blue tack")
+
+    assert request.url == "https://api.search.brave.com/res/v1/images/search"
+
+
 def test_api_key_none_and_env_var_not_set(monkeypatch):
     monkeypatch.delenv("BRAVE_API_KEY", raising=False)
     with pytest.raises(BraveError):

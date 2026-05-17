@@ -1,9 +1,9 @@
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from ..shared.meta_url import MetaUrl
 from ..shared.thumbnail import Thumbnail
 from .result import Result
@@ -25,7 +25,7 @@ class NewsResult(Result):
     )
 
 
-class News(BaseModel):
+class News(BraveSearchModel):
     """A model representing news results."""
 
     type: str = Field(default="news", description="The type representing the news. The value is always news.")

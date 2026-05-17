@@ -1,0 +1,25 @@
+{
+    "type": "search",
+    "query": {
+        "original": "black myth wukong"
+    },
+    "videos": {
+        "type": "videos",
+        "results": [
+            {
+                "type": "video_result",
+                "url": "https://www.youtube.com/watch?v=VLnywm2XgJg",
+                "title": "Black Myth: Wukong - Before You Buy - YouTube",
+                "description": "Black Myth: Wukong review video.",
+                "age": "August 16, 2024",
+                "page_age": "2024-08-16T17:41:12",
+                "video": {
+                    "duration": "12:22",
+                    "views": 2832944,
+                    "creator": "gameranx",
+                    "publisher": "YouTube"
+                }
+            }
+        ]
+    }
+}

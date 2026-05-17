@@ -1,10 +1,11 @@
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 
-class Language(BaseModel):
+
+class Language(BraveSearchModel):
     """
     A model representing a language.
 

@@ -1,12 +1,12 @@
 from typing import List
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from ..shared.thumbnail import Thumbnail
 
 
-class PictureResults(BaseModel):
+class PictureResults(BraveSearchModel):
     """A model representing a list of pictures."""
 
     viewMoreUrl: str = Field(description="A URL to view more pictures.")

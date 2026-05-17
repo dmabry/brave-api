@@ -1,11 +1,12 @@
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 
-class ResultReference(BaseModel):
+
+class ResultReference(BraveSearchModel):
     """The ranking order of results on a search result page."""
 
     type: Optional[str] = Field(default=None, description="The type of the result.")
@@ -15,7 +16,7 @@ class ResultReference(BaseModel):
     )
 
 
-class MixedResponse(BaseModel):
+class MixedResponse(BraveSearchModel):
     """The ranking order of results on a search result page."""
 
     type: str = Field(

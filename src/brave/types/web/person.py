@@ -1,12 +1,12 @@
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from ..shared.thumbnail import Thumbnail
 
 
-class Person(BaseModel):
+class Person(BraveSearchModel):
     """A model representing a person entity"""
 
     type: Optional[str] = Field(

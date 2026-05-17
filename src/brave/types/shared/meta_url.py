@@ -1,9 +1,10 @@
-from pydantic import BaseModel
 from pydantic import Field
 from pydantic import HttpUrl
 
+from ..base import BraveSearchModel
 
-class MetaUrl(BaseModel):
+
+class MetaUrl(BraveSearchModel):
     """
     Aggregated information about a URL.
 

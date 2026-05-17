@@ -1,8 +1,9 @@
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 
-class DataProvider(BaseModel):
+
+class DataProvider(BraveSearchModel):
     """A model representing the data provider associated with the entity."""
 
     type: str = Field(

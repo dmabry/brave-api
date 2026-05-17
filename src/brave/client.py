@@ -1,11 +1,33 @@
 import os
 
+from typing import Any
 from typing import Dict
+from typing import Mapping
 from typing import Optional
 
+from brave._request import BraveRequest
+from brave._request import BraveRequestOptions
+from brave._request import BraveSearchRequestBuilder
+from brave._request import GogglesValue
+from brave._request import build_headers
+from brave._request import merge_options
 from brave.exceptions import BraveError
+from brave.exceptions import BraveHTTPError
 from brave.types import ImageSearchApiResponse
 from brave.types import WebSearchApiResponse
+from brave.types.parser import parse_response
+
+
+_RETRYABLE_HTTP_STATUS_CODES = {408, 409, 425, 429}
+
+
+def is_retryable_error(exception: BaseException) -> bool:
+    """Return whether the transport should retry an exception."""
+    if not isinstance(exception, BraveError):
+        return False
+    if exception.status_code is None:
+        return True
+    return exception.status_code >= 500 or exception.status_code in _RETRYABLE_HTTP_STATUS_CODES
 
 
 class BraveAPIClient:
@@ -21,7 +43,16 @@ class BraveAPIClient:
         The endpoint to be used for API requests (default: "web").
     """
 
-    def __init__(self, api_key: Optional[str] = None, endpoint: str = "web") -> None:
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        endpoint: str = "web",
+        timeout: Optional[float] = None,
+        api_version: Optional[str] = None,
+        cache_control: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        location: Optional[Mapping[str, Any]] = None,
+    ) -> None:
         if api_key is None:
             api_key = os.environ.get("BRAVE_API_KEY")
         if api_key is None:
@@ -31,19 +62,74 @@ class BraveAPIClient:
             )
         self.api_key = api_key
         self.endpoint = endpoint
-        self.base_url = "https://api.search.brave.com/res/v1/"
+        self.base_url = "https://api.search.brave.com/res/v1"
+        self._request_options = BraveRequestOptions(
+            timeout=timeout,
+            api_version=api_version,
+            cache_control=cache_control,
+            user_agent=user_agent,
+            location=location,
+        )
 
-    def _prepare_headers(self) -> Dict:
+    def _prepare_headers(self, options: Optional[BraveRequestOptions] = None) -> Dict[str, str]:
         """Prepare the common headers required for the API requests."""
-        return {"Accept": "application/json", "Accept-Encoding": "gzip", "X-Subscription-Token": self.api_key}
+        return build_headers(self.api_key, options or self._request_options)
 
-    def _get(self, params: Optional[Dict] = None) -> Dict:
+    def _request_builder(self, options: Optional[BraveRequestOptions] = None) -> BraveSearchRequestBuilder:
+        return BraveSearchRequestBuilder(self.api_key, self.base_url, options or self._request_options)
+
+    def _request_options_with_overrides(
+        self,
+        timeout: Optional[float] = None,
+        api_version: Optional[str] = None,
+        cache_control: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        location: Optional[Mapping[str, Any]] = None,
+    ) -> BraveRequestOptions:
+        return merge_options(
+            self._request_options,
+            timeout=timeout,
+            api_version=api_version,
+            cache_control=cache_control,
+            user_agent=user_agent,
+            location=location,
+        )
+
+    def _build_endpoint_request(self, params: Optional[Dict] = None) -> BraveRequest:
+        return self._request_builder().endpoint_search(self.endpoint, params=params)
+
+    def _raise_for_status(self, response: object) -> None:
+        status_code = getattr(response, "status_code", None)
+        if status_code is None or 200 <= status_code < 300:
+            return
+
+        response_body = getattr(response, "text", "")
+        raise BraveHTTPError(
+            f"API Error: {status_code} - {response_body}",
+            status_code=status_code,
+            response_body=response_body,
+        )
+
+    def _parse_response(self, response: object, response_model: object, raw: Optional[bool] = False) -> object:
+        self._raise_for_status(response)
+        payload = response.json()
+        if raw:
+            return payload
+        response_url = getattr(response, "url", None)
+        return parse_response(
+            response_model,
+            payload,
+            status_code=getattr(response, "status_code", None),
+            url=str(response_url) if response_url is not None else None,
+        )
+
+    def _get(self, params: Optional[Dict] = None, request: Optional[BraveRequest] = None) -> Dict:
         """
         GET request method placeholder.
 
         This will be overridden in the derived synchronous and asynchronous clients.
         """
-        pass
+        raise NotImplementedError
 
     def search(
         self,
@@ -62,6 +148,13 @@ class BraveAPIClient:
         units: Optional[str] = None,
         extra_snippets: Optional[bool] = False,
         raw: Optional[bool] = False,
+        *,
+        goggles: Optional[GogglesValue] = None,
+        timeout: Optional[float] = None,
+        api_version: Optional[str] = None,
+        cache_control: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        location: Optional[Mapping[str, Any]] = None,
     ) -> WebSearchApiResponse:
         """
         Perform a search using the Brave Search API.
@@ -92,47 +185,39 @@ class BraveAPIClient:
             Types of results to include.
         goggles_id: str
             The goggle URL to rerank search results.
+        goggles: str or sequence of str
+            The goggle URL or definition to rerank search results.
         units: str
             Measurement units (metric or imperial).
         extra_snippets: bool
             Enable extra alternate snippets (default: False).
         """
-
-        # Parameter validation and query parameter construction
-        if not q or len(q) > 400 or len(q.split()) > 50:
-            raise ValueError("Invalid query parameter 'q'")
-
-        params = {
-            "q": q,
-            "country": country,
-            "search_lang": search_lang,
-            "ui_lang": ui_lang,
-            "count": min(count, 20),
-            "offset": min(offset, 9),
-            "safesearch": safesearch,
-            "freshness": freshness,
-            "text_decorations": text_decorations,
-            "spellcheck": spellcheck,
-            "result_filter": result_filter,
-            "goggles_id": goggles_id,
-            "units": units,
-            "extra_snippets": extra_snippets,
-        }
-
-        # Filter out None values
-        params = {k: v for k, v in params.items() if v is not None}
-
-        # API request and response handling
-        response = self._get(params=params)  # _make_request to be implemented based on sync/async client
-
-        # Error handling and data parsing
-        if response.status_code != 200:
-            # Handle errors (e.g., log them, raise exceptions)
-            raise BraveError(f"API Error: {response.status_code} - {response.text}")
-
-        if raw:
-            return response.json()
-        return WebSearchApiResponse.model_validate(response.json())
+        request_options = self._request_options_with_overrides(
+            timeout=timeout,
+            api_version=api_version,
+            cache_control=cache_control,
+            user_agent=user_agent,
+            location=location,
+        )
+        request = self._request_builder(request_options).web_search(
+            q=q,
+            country=country,
+            search_lang=search_lang,
+            ui_lang=ui_lang,
+            count=count,
+            offset=offset,
+            safesearch=safesearch,
+            freshness=freshness,
+            text_decorations=text_decorations,
+            spellcheck=spellcheck,
+            result_filter=result_filter,
+            goggles_id=goggles_id,
+            units=units,
+            extra_snippets=extra_snippets,
+            goggles=goggles,
+        )
+        response = self._get(request=request)
+        return self._parse_response(response, WebSearchApiResponse, raw=raw)
 
     def image(
         self,
@@ -142,6 +227,13 @@ class BraveAPIClient:
         count: Optional[int] = 20,
         safesearch: Optional[str] = "moderate",
         spellcheck: Optional[bool] = True,
+        raw: Optional[bool] = False,
+        *,
+        timeout: Optional[float] = None,
+        api_version: Optional[str] = None,
+        cache_control: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        location: Optional[Mapping[str, Any]] = None,
     ) -> ImageSearchApiResponse:
         """
         Perform an image search using the Brave Search API.
@@ -161,24 +253,20 @@ class BraveAPIClient:
         spellcheck: bool
             Spellcheck the query (default: True).
         """
-
-        # Parameter validation and query parameter construction
-        if not q or len(q) > 400 or len(q.split()) > 50:
-            raise ValueError("Invalid query parameter 'q'")
-
-        params = {
-            "q": q,
-            "country": country,
-            "search_lang": search_lang,
-            "count": min(count, 20),
-            "safesearch": safesearch,
-            "spellcheck": spellcheck,
-        }
-
-        # Filter out None values
-        params = {k: v for k, v in params.items() if v is not None}
-
-        # API request and response handling
-        response = self._get(params=params)
-
-        return ImageSearchApiResponse.model_validate(response.json())
+        request_options = self._request_options_with_overrides(
+            timeout=timeout,
+            api_version=api_version,
+            cache_control=cache_control,
+            user_agent=user_agent,
+            location=location,
+        )
+        request = self._request_builder(request_options).image_search(
+            q=q,
+            country=country,
+            search_lang=search_lang,
+            count=count,
+            safesearch=safesearch,
+            spellcheck=spellcheck,
+        )
+        response = self._get(request=request)
+        return self._parse_response(response, ImageSearchApiResponse, raw=raw)

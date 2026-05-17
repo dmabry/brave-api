@@ -1,10 +1,10 @@
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from ..shared.thumbnail import Thumbnail
 
 
-class ImageProperties(BaseModel):
+class ImageProperties(BraveSearchModel):
     """Metadata on an image."""
 
     url: str = Field(description="The image URL.")
@@ -15,7 +15,7 @@ class ImageProperties(BaseModel):
     content_size: str = Field(description="The image storage size.")
 
 
-class Image(BaseModel):
+class Image(BraveSearchModel):
     """A model describing an image."""
 
     thumbnail: Thumbnail = Field(description="The thumbnail associated with the image.")

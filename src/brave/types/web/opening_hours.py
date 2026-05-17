@@ -1,10 +1,11 @@
 from typing import List
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 
-class DayOpeningHours(BaseModel):
+
+class DayOpeningHours(BraveSearchModel):
     """A model representing a day opening hour for a business at a particular location."""
 
     abbr_name: str = Field(description="A short string representing the day of the week.")
@@ -17,7 +18,7 @@ class DayOpeningHours(BaseModel):
     )
 
 
-class OpeningHours(BaseModel):
+class OpeningHours(BraveSearchModel):
     """Opening hours of a business at a particular location."""
 
     current_day: List[DayOpeningHours] = Field(

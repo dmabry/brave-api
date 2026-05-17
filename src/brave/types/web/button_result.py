@@ -1,9 +1,10 @@
-from pydantic import BaseModel
 from pydantic import Field
 from pydantic import HttpUrl
 
+from ..base import BraveSearchModel
 
-class ButtonResult(BaseModel):
+
+class ButtonResult(BraveSearchModel):
     """A result which can be used as a button."""
 
     type: str = Field(

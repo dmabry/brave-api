@@ -24,3 +24,23 @@ Want to learn more about the motivation for Goggles? Check out the [Goggles whit
 
 - Thought Leadership
 - Academic Research
+
+## Package usage
+
+Existing URL constants are still available:
+
+```python
+from brave.goggles import thought_leadership
+```
+
+Local `.goggle` files and inline definitions can be adapted to the current Brave
+API parameter shape with `to_request_params`:
+
+```python
+from pathlib import Path
+
+from brave.goggles import to_request_params
+
+params = to_request_params(Path("my-search.goggle"))
+# {"goggles": "...file contents..."}
+```

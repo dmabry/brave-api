@@ -1,9 +1,9 @@
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from ..shared.thumbnail import Thumbnail
 from .person import Person
 
@@ -17,7 +17,7 @@ class Organization(Person):
     )
 
 
-class Article(BaseModel):
+class Article(BraveSearchModel):
     """A model representing an article."""
 
     author: Optional[List[Person]] = Field(default=None, description="The author of the article.")

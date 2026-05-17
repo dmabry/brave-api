@@ -11,7 +11,7 @@ init: clean install test ## Clean environment and reinstall all dependencies
 
 .PHONY: clean
 clean: ## Removes project virtual env
-	rm -rf .venv cdk.out build dist **/*.egg-info .pytest_cache node_modules .coverage
+	rm -rf .venv .package-smoke-venv cdk.out build dist **/*.egg-info .pytest_cache node_modules .coverage
 
 .PHONY: install
 install: ## Install the project dependencies and pre-commit using Poetry.
@@ -21,6 +21,10 @@ install: ## Install the project dependencies and pre-commit using Poetry.
 .PHONY: test
 test: ## Run tests
 	poetry run python -m pytest
+
+.PHONY: package-check
+package-check: ## Build the wheel, validate metadata, and smoke test a fresh install
+	bash .github/package/check-package.sh
 
 .PHONY: lint
 lint: ## Apply linters to all files

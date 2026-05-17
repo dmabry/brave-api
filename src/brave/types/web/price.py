@@ -1,8 +1,9 @@
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 
-class Price(BaseModel):
+
+class Price(BraveSearchModel):
     """A model describing a price for an entity."""
 
     price: str = Field(description="The price value in a given currency.")

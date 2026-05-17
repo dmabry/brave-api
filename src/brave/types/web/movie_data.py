@@ -1,14 +1,14 @@
 from typing import List
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from ..shared.thumbnail import Thumbnail
 from .person import Person
 from .rating import Rating
 
 
-class MovieData(BaseModel):
+class MovieData(BraveSearchModel):
     """Aggregated data for a movie result."""
 
     name: str = Field(description="Name of the movie.")

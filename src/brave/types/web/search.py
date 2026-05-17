@@ -1,12 +1,13 @@
 from typing import List
+from typing import Optional
 
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 from .search_result import SearchResult
 
 
-class Search(BaseModel):
+class Search(BraveSearchModel):
     """
     Model represents a collection of web search results.
 
@@ -17,4 +18,6 @@ class Search(BaseModel):
         default="search", description="A type identifying web search results. The value is always search."
     )
     results: List[SearchResult] = Field(description="A list of web search results.")
-    family_friendly: bool = Field(description="Whether the web search results are family friendly.")
+    family_friendly: Optional[bool] = Field(
+        default=None, description="Whether the web search results are family friendly."
+    )

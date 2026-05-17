@@ -1,8 +1,9 @@
-from pydantic import BaseModel
 from pydantic import Field
 
+from ..base import BraveSearchModel
 
-class Unit(BaseModel):
+
+class Unit(BraveSearchModel):
     """A model representing a unit of measurement."""
 
     value: float = Field(description="The quantity of the unit.")

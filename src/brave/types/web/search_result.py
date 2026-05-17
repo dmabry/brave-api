@@ -1,18 +1,13 @@
-import logging
-import os
-
 from typing import List
 from typing import Optional
 from typing import Union
 
-import requests
-
 from pydantic import Field
 
-from brave.exceptions import BraveError
+from brave.downloads import DEFAULT_DOWNLOAD_TIMEOUT
+from brave.downloads import download_pdf_file
 
 from ..not_implemented import CreativeWork
-from ..not_implemented import DeepResult
 from ..not_implemented import Movie
 from ..not_implemented import MusicRecording
 from ..not_implemented import Software
@@ -21,8 +16,8 @@ from ..shared.meta_url import MetaUrl
 from ..shared.thumbnail import Thumbnail
 from .article import Article
 from .book import Book
+from .deep_result import DeepResult
 from .faq import FAQ
-from .faq import QA
 from .faq import QAPage
 from .location_result import LocationResult
 from .location_result import Locations
@@ -30,9 +25,6 @@ from .product import Product
 from .rating import Rating
 from .result import Result
 from .reviews import Review
-
-
-logger = logging.getLogger(__name__)
 
 
 class SearchResult(Result):
@@ -85,7 +77,7 @@ class SearchResult(Result):
     cluster_type: Optional[str] = Field(
         default=None, description="A type representing a cluster. The value can be product_cluster."
     )
-    cluster: Optional[List[Result]] = Field(default=[], description="A list of web search results.")
+    cluster: Optional[List[Result]] = Field(default_factory=list, description="A list of web search results.")
     creative_work: Optional[CreativeWork] = Field(
         default=None, description="Aggregated information on the creative work found on the web search result."
     )
@@ -105,26 +97,21 @@ class SearchResult(Result):
         default=None, description="A list of extra alternate snippets for the web page."
     )
 
-    def download_pdf(self, path: str = "downloads") -> None:
+    def download_pdf(self, path: str = "downloads", timeout: float = DEFAULT_DOWNLOAD_TIMEOUT) -> str:
         """
         Download a PDF file from the specified URL.
 
         Parameters:
         -----------
-        url : str
-            The URL of the PDF file.
-        filename : str
-            The name of the file to save the PDF to.
+        path : str
+            The directory where the PDF should be saved.
+        timeout : float
+            Number of seconds to wait for the download request.
         """
-        try:
-            # check if directory "downloads" exists
-            if not os.path.exists(path):
-                os.makedirs(path)
-            response = requests.get(self.url.__str__())
-            if response.status_code == 200:
-                with open(f"{path}/{self.title}-{self.age}.pdf", "wb") as f:
-                    f.write(response.content)
-            else:
-                logger.warning("Error: Unable to download the file. Status code:", response.status_code)
-        except Exception as e:
-            logger.info(BraveError(f"Error downloading PDF: {e}"))
+        return download_pdf_file(
+            url=str(self.url),
+            path=path,
+            title=self.title,
+            age=self.age,
+            timeout=timeout,
+        )
